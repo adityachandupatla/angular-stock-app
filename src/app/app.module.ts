@@ -12,6 +12,9 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MaterialModule } from './components/search/material-module';
+import { WatchlistComponent } from './components/watchlist/watchlist.component';
+import { PortfolioComponent } from './components/portfolio/portfolio.component';
+import { DetailsComponent } from './components/details/details.component';
 
 
 
@@ -20,7 +23,10 @@ import { MaterialModule } from './components/search/material-module';
     AppComponent,
     HeaderComponent,
     FooterComponent,
-    SearchComponent
+    SearchComponent,
+    WatchlistComponent,
+    PortfolioComponent,
+    DetailsComponent
   ],
   imports: [
     BrowserModule,
