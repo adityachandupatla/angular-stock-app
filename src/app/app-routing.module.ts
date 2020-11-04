@@ -9,7 +9,8 @@ const routes: Routes = [
     { path: '', component: SearchComponent },
     { path: 'watchlist', component: WatchlistComponent },
     { path: 'portfolio', component: PortfolioComponent },
-    { path: 'details', component: DetailsComponent }
+    { path: 'details', component: DetailsComponent },
+    { path: '**', redirectTo: '', pathMatch: 'full' }
 ];
 
 @NgModule({
