@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { Observable } from 'rxjs';
-import { map, startWith } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { SearchItem } from 'src/app/models/SearchItem';
+import { SearchService } from 'src/app/services/search.service';
 
 @Component({
     selector: 'app-search',
@@ -10,21 +11,22 @@ import { map, startWith } from 'rxjs/operators';
 })
 export class SearchComponent implements OnInit {
     myControl = new FormControl();
-    options: string[] = ['One', 'Two', 'Three'];
-    filteredOptions: Observable<string[]>;
+    options: SearchItem[] = [];
 
-    ngOnInit() {
-        this.filteredOptions = this.myControl.valueChanges
-            .pipe(
-                startWith(''),
-                map(value => this._filter(value))
-            );
+    constructor(private searchService: SearchService) { }
+
+    displayFn(searchItem: SearchItem): string {
+        return searchItem && searchItem.ticker ? searchItem.ticker : '';
     }
 
-    private _filter(value: string): string[] {
-        const filterValue = value.toLowerCase();
-
-        return this.options.filter(option => option.toLowerCase().includes(filterValue));
+    ngOnInit() {
+        this.myControl.valueChanges
+            .pipe(
+                debounceTime(500),
+                distinctUntilChanged(),
+                switchMap(value => this.searchService.getSearchRecommendation(value))
+            )
+            .subscribe(result => this.options = result);
     }
 
 }
