@@ -3,6 +3,7 @@ import { FormControl } from '@angular/forms';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { SearchItem } from 'src/app/models/SearchItem';
 import { SearchService } from 'src/app/services/search.service';
+import {Router} from '@angular/router';
 
 @Component({
     selector: 'app-search',
@@ -13,7 +14,7 @@ export class SearchComponent implements OnInit {
     myControl = new FormControl();
     options: SearchItem[] = [];
 
-    constructor(private searchService: SearchService) { }
+    constructor(private router: Router, private searchService: SearchService) { }
 
     displayFn(searchItem: SearchItem): string {
         return searchItem && searchItem.ticker ? searchItem.ticker : '';
@@ -27,6 +28,12 @@ export class SearchComponent implements OnInit {
                 switchMap(value => this.searchService.getSearchRecommendation(value))
             )
             .subscribe(result => this.options = result);
+    }
+
+    tickerDetails() {
+        if (this.myControl.value && this.myControl.value.ticker) {
+            this.router.navigateByUrl('/details/' + this.myControl.value.ticker);
+        }
     }
 
 }
