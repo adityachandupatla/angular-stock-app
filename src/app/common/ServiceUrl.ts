@@ -1,10 +1,10 @@
 export class ServiceUrl {
-    public static searchUrl: string = 'http://localhost:3000/stock/api/v1.0/search?query=';
-    public static outlookUrl: string = 'http://localhost:3000/stock/api/v1.0/outlook/';
-    public static summaryUrl: string = 'http://localhost:3000/stock/api/v1.0/summary/';
+    public static searchUrl: string = '/stock/api/v1.0/search?query=';
+    public static outlookUrl: string = '/stock/api/v1.0/outlook/';
+    public static summaryUrl: string = '/stock/api/v1.0/summary/';
     // Needs startDate and resampleFreq
-    public static historicalUrl: string = 'http://localhost:3000/stock/api/v1.0/historical/';
+    public static historicalUrl: string = '/stock/api/v1.0/historical/';
     // Needs startDate and resampleFreq
-    public static dailyUrl: string = 'http://localhost:3000/stock/api/v1.0/daily/';
-    public static newsUrl: string = 'http://localhost:3000/stock/api/v1.0/news/';
+    public static dailyUrl: string = '/stock/api/v1.0/daily/';
+    public static newsUrl: string = '/stock/api/v1.0/news/';
 }
