@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { DetailsService } from 'src/app/services/details.service';
 
 @Component({
     selector: 'app-details',
@@ -8,10 +9,19 @@ import { ActivatedRoute } from '@angular/router';
 })
 export class DetailsComponent implements OnInit {
 
-    constructor(private route: ActivatedRoute) { }
+    ticker: string;
+    showSpinner: boolean;
+
+    constructor(private route: ActivatedRoute,
+        private detailsService: DetailsService) { }
 
     ngOnInit(): void {
-        console.log(this.route.snapshot.paramMap.get('ticker'));
+        this.showSpinner = true;
+        this.ticker = this.route.snapshot.paramMap.get('ticker');
+        this.detailsService.getDetails(this.ticker).subscribe(result => {
+            console.log(result);
+            this.showSpinner = false;
+        });
     }
 
 }
