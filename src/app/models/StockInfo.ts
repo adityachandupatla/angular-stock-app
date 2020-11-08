@@ -1,5 +1,5 @@
 export class StockInfo {
-   date: string;
+   date: number;
    open: number;
    high: number;
    low: number;

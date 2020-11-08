@@ -7,7 +7,7 @@ export class SummaryModel {
     openingPrice: number;
     highPrice: number;
     lowPrice: number;
-    numberOfSharesTraded: number;
+    volume: number;
     bidSize: number;
     bidPrice: number;
     askSize: number;

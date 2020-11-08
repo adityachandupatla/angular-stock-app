@@ -15,7 +15,8 @@ import { MaterialModule } from './components/search/material-module';
 import { WatchlistComponent } from './components/watchlist/watchlist.component';
 import { PortfolioComponent } from './components/portfolio/portfolio.component';
 import { DetailsComponent } from './components/details/details.component';
-
+import { MatTabsModule } from '@angular/material/tabs';
+import { HighchartsChartModule } from 'highcharts-angular';
 
 
 @NgModule({
@@ -37,7 +38,12 @@ import { DetailsComponent } from './components/details/details.component';
     HttpClientModule,
     MatNativeDateModule,
     ReactiveFormsModule,
-    MaterialModule
+    MaterialModule,
+    MatTabsModule,
+    HighchartsChartModule
+  ],
+  exports: [
+    MatTabsModule
   ],
   providers: [
     { provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: { appearance: 'fill' } }
