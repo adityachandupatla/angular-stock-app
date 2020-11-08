@@ -50,6 +50,7 @@ export class DetailsComponent implements OnInit {
     greenColorVar = true;
     marketOpen = true;
     marketClosedOn: Date;
+    dailyColor: string;
 
     closeResult = '';
 
@@ -65,7 +66,9 @@ export class DetailsComponent implements OnInit {
     myControl = new FormControl();
 
     Highcharts: typeof Highcharts = Highcharts;
+    DailyHighcharts: typeof Highcharts = Highcharts;
     chartOptions: Highcharts.Options;
+    dailyChartOptions: Highcharts.Options;
     updateFlag: boolean = false;
 
     constructor(private route: ActivatedRoute,
@@ -148,7 +151,15 @@ export class DetailsComponent implements OnInit {
 
             this.updateFlag = true;
 
-            this.plotHighChart(this.details.historicalStockInfo);
+            if (this.marketOpen) {
+                this.dailyColor = '#3D813B';
+            }
+            else {
+                this.dailyColor = '#CA343B';
+            }
+
+            this.plotDailyHighChart(this.details.dailyStockInfo);
+            this.plotHistoricalHighChart(this.details.historicalStockInfo);
 
             this.showSpinner = false;
         });
@@ -220,7 +231,63 @@ export class DetailsComponent implements OnInit {
         }, 2000)
     }
 
-    plotHighChart(stockInfoModel: StockInfoModel) {
+    plotDailyHighChart(stockInfoModel: StockInfoModel) {
+        if (stockInfoModel.parsing === false) {
+            console.log("Received parsing = false for historical data from backend");
+            return;
+        }
+
+        let info = stockInfoModel.data;
+
+        let dailyData = [];
+        for (let i = 0;i < info.length;++i) {
+            dailyData.push([info[i].date, info[i].close]);
+        }
+        console.log(dailyData);
+
+        // create the chart
+        this.dailyChartOptions = {
+
+            navigator: {
+                enabled: true,
+                adaptToUpdatedData: true
+            },
+
+            title: {
+                text: this.ticker
+            },
+
+            xAxis: {
+                type: 'datetime'
+            },
+
+            scrollbar: {
+                barBackgroundColor: this.dailyColor,
+                barBorderRadius: 7,
+                barBorderWidth: 0,
+                buttonBackgroundColor: this.dailyColor,
+                buttonBorderWidth: 0,
+                buttonBorderRadius: 7,
+                trackBackgroundColor: this.dailyColor,
+                trackBorderWidth: 1,
+                trackBorderRadius: 8,
+                trackBorderColor: this.dailyColor
+            },
+    
+            series: [{
+                type: 'line',
+                name: this.ticker,
+                data: dailyData,
+                tooltip: {
+                    valueDecimals: 2
+                },
+                color: this.dailyColor
+            }]
+        };
+
+    }
+
+    plotHistoricalHighChart(stockInfoModel: StockInfoModel) {
         if (stockInfoModel.parsing === false) {
             console.log("Received parsing = false for historical data from backend");
             return;

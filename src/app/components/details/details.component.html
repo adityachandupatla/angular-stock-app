@@ -120,7 +120,9 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col last-working-day-chart-container"></div>
+                        <div class="col last-working-day-chart-container">
+                            <highcharts-chart [Highcharts]="DailyHighcharts" [constructorType]="stockChart" [options]="dailyChartOptions" [(update)]="updateFlag" style="height: 450px; display: block;margin-top: 20px"></highcharts-chart>
+                        </div>
                     </div>
                 </div>
             </mat-tab>

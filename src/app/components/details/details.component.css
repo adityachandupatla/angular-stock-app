@@ -26,9 +26,9 @@
 }
 
 .stock-last-price {
-    font-size: 45px;
+    font-size: 35px;
     margin-bottom: 8px;
-    margin-top: 20px;
+    margin-top: 25px;
 }
 
 .stock-change {
@@ -40,7 +40,7 @@
 .current-date {
     font-size: 15px;
     color: rgb(112, 126, 125);
-    margin-top: 10px;
+    margin-top: 15px;
 }
 
 .buy-button {
@@ -64,7 +64,7 @@
 
 .example-stretched-tabs {
     max-width: 1250px;
-    /* height: 500px; */
+    min-height: 470px;
     margin-top: 20px;
     overflow: auto;
 }
