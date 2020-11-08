@@ -1,5 +1,7 @@
 .container {
-    height: 615px;
+    min-height: 660px;
+    display: table;
+    margin-bottom: 30px;
 }
 
 .watchlist-header {
