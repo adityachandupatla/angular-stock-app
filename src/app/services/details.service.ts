@@ -36,12 +36,29 @@ export class DetailsService {
     getDetails(ticker: string): Observable<DetailsModel> {
         let twoYearAgoDate = new Date().setFullYear(new Date().getFullYear() - 2);
         let startDate = this.formatDate(twoYearAgoDate);
+        let today = new Date();
+        let dailyStartDate;
+        if (today.getDay() == 6 || today.getDay() == 0) {
+            let now = new Date();
+            let day = now.getDay();
+            let diff = (day <= 5) ? (7 - 5 + day ) : (day - 5);
+            let friday = new Date();
+            friday.setDate(now.getDate() - diff);
+            friday.setHours(0);
+            friday.setMinutes(0);
+            friday.setSeconds(0);
+            dailyStartDate = this.formatDate(friday);
+        }
+        else {
+            dailyStartDate = this.formatDate(today);
+        }
         return forkJoin(
             {
                 outlookModel: this._http.get<OutlookModel>(ServiceUrl.outlookUrl + ticker),
                 summaryModel: this._http.get<SummaryModel>(ServiceUrl.summaryUrl + ticker),
                 newsModel: this._http.get<NewsModel>(ServiceUrl.newsUrl + ticker),
-                historicalModel: this._http.get<StockInfoModel>(ServiceUrl.historicalUrl + ticker + "?startDate=" + startDate)
+                historicalModel: this._http.get<StockInfoModel>(ServiceUrl.historicalUrl + ticker + "?startDate=" + startDate),
+                dailyModel: this._http.get<StockInfoModel>(ServiceUrl.dailyUrl + ticker + "?startDate=" + dailyStartDate + "&resampleFreq=4min")
             }
         ).pipe(
             concatMap(result => {
@@ -50,6 +67,7 @@ export class DetailsService {
                 this.detailsModel.summaryModel = result.summaryModel;
                 this.detailsModel.newsModel = result.newsModel;
                 this.detailsModel.historicalStockInfo = result.historicalModel;
+                this.detailsModel.dailyStockInfo = result.dailyModel;
                 return of(this.detailsModel);
             })
         );
