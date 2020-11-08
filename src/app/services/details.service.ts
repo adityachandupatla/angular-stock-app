@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { ServiceUrl } from '../common/ServiceUrl';
 import { OutlookModel } from '../models/OutlookModel';
-import { forkJoin, Observable, of } from 'rxjs';
+import { forkJoin, interval, Observable, of } from 'rxjs';
 import { SummaryModel } from '../models/SummaryModel';
 import { NewsModel } from '../models/NewsModel';
 import { DetailsModel } from '../models/DetailsModel';
@@ -33,7 +33,7 @@ export class DetailsService {
         return [year, month, day].join('-');
     }
 
-    getDetails(ticker: string): Observable<DetailsModel> {
+    getDetails(ticker: string, firstTime: boolean): Observable<DetailsModel> {
         let twoYearAgoDate = new Date().setFullYear(new Date().getFullYear() - 2);
         let startDate = this.formatDate(twoYearAgoDate);
         let today = new Date();
@@ -52,24 +52,41 @@ export class DetailsService {
         else {
             dailyStartDate = this.formatDate(today);
         }
-        return forkJoin(
-            {
+        if (firstTime) {
+            return forkJoin({
                 outlookModel: this._http.get<OutlookModel>(ServiceUrl.outlookUrl + ticker),
                 summaryModel: this._http.get<SummaryModel>(ServiceUrl.summaryUrl + ticker),
                 newsModel: this._http.get<NewsModel>(ServiceUrl.newsUrl + ticker),
-                historicalModel: this._http.get<StockInfoModel>(ServiceUrl.historicalUrl + ticker + "?startDate=" + startDate),
+                dailyModel: this._http.get<StockInfoModel>(ServiceUrl.dailyUrl + ticker + "?startDate=" + dailyStartDate + "&resampleFreq=4min"),
+                historicalModel: this._http.get<StockInfoModel>(ServiceUrl.historicalUrl + ticker + "?startDate=" + startDate)
+            }).pipe(
+                concatMap(result => {
+                    this.detailsModel = new DetailsModel();
+                    this.detailsModel.outlookModel = result.outlookModel;
+                    this.detailsModel.summaryModel = result.summaryModel;
+                    this.detailsModel.newsModel = result.newsModel;
+                    this.detailsModel.historicalStockInfo = result.historicalModel;
+                    this.detailsModel.dailyStockInfo = result.dailyModel;
+                    return of(this.detailsModel);
+                })
+            );
+        }
+        else {
+            return forkJoin({
+                outlookModel: this._http.get<OutlookModel>(ServiceUrl.outlookUrl + ticker),
+                summaryModel: this._http.get<SummaryModel>(ServiceUrl.summaryUrl + ticker),
+                newsModel: this._http.get<NewsModel>(ServiceUrl.newsUrl + ticker),
                 dailyModel: this._http.get<StockInfoModel>(ServiceUrl.dailyUrl + ticker + "?startDate=" + dailyStartDate + "&resampleFreq=4min")
-            }
-        ).pipe(
-            concatMap(result => {
-                this.detailsModel = new DetailsModel();
-                this.detailsModel.outlookModel = result.outlookModel;
-                this.detailsModel.summaryModel = result.summaryModel;
-                this.detailsModel.newsModel = result.newsModel;
-                this.detailsModel.historicalStockInfo = result.historicalModel;
-                this.detailsModel.dailyStockInfo = result.dailyModel;
-                return of(this.detailsModel);
-            })
-        );
+            }).pipe(
+                concatMap(result => {
+                    this.detailsModel = new DetailsModel();
+                    this.detailsModel.outlookModel = result.outlookModel;
+                    this.detailsModel.summaryModel = result.summaryModel;
+                    this.detailsModel.newsModel = result.newsModel;
+                    this.detailsModel.dailyStockInfo = result.dailyModel;
+                    return of(this.detailsModel);
+                })
+            );
+        }
     }
 }

@@ -74,10 +74,14 @@ export class PortfolioComponent implements OnInit {
                     portfolioModel.quantity = portfolioStorageModel.quantity;
                     portfolioModel.companyName = portfolioStorageModel.companyName;
                     portfolioModel.totalCost = portfolioStorageModel.totalCost;
+                    portfolioModel.totalCostStr = Utility.beautify(portfolioModel.totalCost);
 
                     portfolioModel.marketValue = portfolioModel.currentPrice * portfolioModel.quantity;
+                    portfolioModel.marketValueStr = Utility.beautify(portfolioModel.marketValue);
                     portfolioModel.avgCostPerShare = portfolioModel.totalCost / portfolioModel.quantity;
+                    portfolioModel.avgCostPerShareStr = Utility.beautify(portfolioModel.avgCostPerShare);
                     portfolioModel.change = portfolioModel.currentPrice - portfolioModel.avgCostPerShare;
+                    portfolioModel.changeStr = Utility.beautify(portfolioModel.change);
 
                     if (portfolioModel.change == 0) {
                         portfolioModel.changed = false;
@@ -160,9 +164,13 @@ export class PortfolioComponent implements OnInit {
             if (this.portfolioModels[i].ticker === this.buyStockTicker) {
                 this.portfolioModels[i].quantity += this.buyStockQuantity;
                 this.portfolioModels[i].totalCost += this.buyStockQuantity * this.buyStockCurrentPrice;
+                this.portfolioModels[i].totalCostStr = Utility.beautify(this.portfolioModels[i].totalCost);
                 this.portfolioModels[i].marketValue = this.buyStockCurrentPrice * this.portfolioModels[i].quantity;
+                this.portfolioModels[i].marketValueStr = Utility.beautify(this.portfolioModels[i].marketValue);
                 this.portfolioModels[i].avgCostPerShare = this.portfolioModels[i].totalCost / this.portfolioModels[i].quantity;
+                this.portfolioModels[i].avgCostPerShareStr = Utility.beautify(this.portfolioModels[i].avgCostPerShare);
                 this.portfolioModels[i].change = this.buyStockCurrentPrice - this.portfolioModels[i].avgCostPerShare;
+                this.portfolioModels[i].changeStr = Utility.beautify(this.portfolioModels[i].change);
                 if (this.portfolioModels[i].change == 0) {
                     this.portfolioModels[i].changed = false;
                 }
@@ -203,9 +211,13 @@ export class PortfolioComponent implements OnInit {
                 }
                 else {
                     this.portfolioModels[i].totalCost = this.portfolioModels[i].quantity * this.portfolioModels[i].avgCostPerShare;
+                    this.portfolioModels[i].totalCostStr = Utility.beautify(this.portfolioModels[i].totalCost);
                     this.portfolioModels[i].marketValue = this.sellStockCurrentPrice * this.portfolioModels[i].quantity;
+                    this.portfolioModels[i].marketValueStr = Utility.beautify(this.portfolioModels[i].marketValue);
                     this.portfolioModels[i].avgCostPerShare = this.portfolioModels[i].totalCost / this.portfolioModels[i].quantity;
+                    this.portfolioModels[i].avgCostPerShareStr = Utility.beautify(this.portfolioModels[i].avgCostPerShare);
                     this.portfolioModels[i].change = this.sellStockCurrentPrice - this.portfolioModels[i].avgCostPerShare;
+                    this.portfolioModels[i].changeStr = Utility.beautify(this.portfolioModels[i].change);
                     if (this.portfolioModels[i].change == 0) {
                         this.portfolioModels[i].changed = false;
                     }

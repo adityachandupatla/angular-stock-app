@@ -22,6 +22,7 @@ import HC_stock from 'highcharts/modules/stock';
 import vbp from 'highcharts/indicators/volume-by-price';
 import { StockInfoModel } from 'src/app/models/StockInfoModel';
 import { StockInfo } from 'src/app/models/StockInfo';
+import { interval } from 'rxjs';
 
 more(Highcharts);
 IndicatorsCore(Highcharts);
@@ -58,10 +59,10 @@ export class DetailsComponent implements OnInit {
     twitterContent: string;
     fbContent: string;
 
-    costprice: number;
-    costpriceStr: string;
+    costprice = 0;
+    costpriceStr = "0.00";
 
-    stockbuyable: boolean;
+    stockbuyable = false;
 
     myControl = new FormControl();
 
@@ -113,19 +114,26 @@ export class DetailsComponent implements OnInit {
         this.details.outlookModel = new OutlookModel();
         this.details.summaryModel = new SummaryModel();
         this.details.newsModel = new NewsModel();
-
-        this.current_date = new Date();
-        this.showSpinner = true;
-
-        this.costprice = 0;
-        this.costpriceStr = "0.00";
-        this.stockbuyable = false;
+        this.details.historicalStockInfo = new StockInfoModel();
+        this.details.dailyStockInfo = new StockInfoModel();
 
         this.ticker = this.route.snapshot.paramMap.get('ticker');
-
         this.isFavorite = this.watchlistService.contains(this.ticker);
+        
+        this.showSpinner = true;
 
-        this.detailsService.getDetails(this.ticker).subscribe(result => {
+        this.current_date = new Date();
+        this.updateDetailsPage(true);
+
+        interval(15000).subscribe(updateNum => {
+            console.log("Calling updateDetailsPage")
+            this.current_date = new Date();
+            this.updateDetailsPage(false);
+        });
+    }
+
+    updateDetailsPage(firstTime: boolean) {
+        this.detailsService.getDetails(this.ticker, firstTime).subscribe(result => {
             this.details = result;
             this.change = this.details.summaryModel.lastPrice - this.details.summaryModel.previousClosingPrice;
             this.changeStr = Utility.beautify(this.change);
@@ -159,14 +167,15 @@ export class DetailsComponent implements OnInit {
             }
 
             this.plotDailyHighChart(this.details.dailyStockInfo);
-            this.plotHistoricalHighChart(this.details.historicalStockInfo);
+            if (firstTime) {
+                let historicalInfo = this.details.historicalStockInfo
+                let curTicker = this.ticker;
+                this.plotHistoricalHighChart(historicalInfo, curTicker);
+            }
 
             this.showSpinner = false;
         });
-
-
     }
-
     open(content) {
         this.modalService.open(content, { ariaLabelledBy: 'modal-basic-title' }).result.then((result) => {
             this.closeResult = `Closed with: ${result}`;
@@ -243,7 +252,6 @@ export class DetailsComponent implements OnInit {
         for (let i = 0;i < info.length;++i) {
             dailyData.push([info[i].date, info[i].close]);
         }
-        console.log(dailyData);
 
         // create the chart
         this.dailyChartOptions = {
@@ -287,7 +295,7 @@ export class DetailsComponent implements OnInit {
 
     }
 
-    plotHistoricalHighChart(stockInfoModel: StockInfoModel) {
+    plotHistoricalHighChart(stockInfoModel: StockInfoModel, curTicker: string) {
         if (stockInfoModel.parsing === false) {
             console.log("Received parsing = false for historical data from backend");
             return;
@@ -328,7 +336,7 @@ export class DetailsComponent implements OnInit {
             },
 
             title: {
-                text: this.ticker + ' Historical'
+                text: curTicker + ' Historical'
             },
 
             subtitle: {
@@ -388,8 +396,8 @@ export class DetailsComponent implements OnInit {
 
             series: [{
                 type: 'candlestick',
-                name: this.ticker,
-                id: this.ticker,
+                name: curTicker,
+                id: curTicker,
                 zIndex: 2,
                 data: ohlc
             }, {
@@ -400,7 +408,7 @@ export class DetailsComponent implements OnInit {
                 yAxis: 1
             }, {
                 type: 'vbp',
-                linkedTo: this.ticker,
+                linkedTo: curTicker,
                 params: {
                     volumeSeriesID: 'volume'
                 },
@@ -412,7 +420,7 @@ export class DetailsComponent implements OnInit {
                 }
             }, {
                 type: 'sma',
-                linkedTo: this.ticker,
+                linkedTo: curTicker,
                 zIndex: 1,
                 marker: {
                     enabled: false
